@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Movie Recommendation System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="page-shell">
+    <div class="page-backdrop"></div>
+
+    <header class="topbar">
+        <a href="/" class="brand">
+            <span class="brand-mark">N</span>
+            <span class="brand-copy">AI Movie Recommendation System</span>
+        </a>
+        <div class="topbar-meta">Content-Based Discovery</div>
+    </header>
+
+    <main class="landing">
+        <section class="hero-panel">
+            <div class="eyebrow">TMDB Multilingual Discovery</div>
+            <h1 class="hero-title">Find your next obsession in one search.</h1>
+            <p class="hero-copy">
+                Search across Hollywood, Telugu, Tamil, and Hindi cinema with a
+                recommendation engine trained on genres, keywords, and plot overviews.
+            </p>
+
+            <div class="hero-tags">
+                <span>Hollywood + Indian Cinema</span>
+                <span>Genres + Keywords + Overview</span>
+                <span>Poster-Ready Results</span>
+            </div>
+
+            {% if error %}
+            <div class="alert">{{ error }}</div>
+            {% endif %}
+
+            <form action="/recommend" method="POST" class="search-form" autocomplete="off" id="recommend-form">
+                <div class="search-wrapper">
+                    <label for="movie-input" class="sr-only">Enter movie name</label>
+                    <input
+                        type="text"
+                        id="movie-input"
+                        name="movie_name"
+                        placeholder="Search titles like RRR, Leo, Dangal, or Inception"
+                        required
+                    />
+                    <button type="submit" class="btn btn-primary">Get Recommendations</button>
+                    <ul id="suggestions" class="suggestions"></ul>
+                </div>
+            </form>
+        </section>
+
+        <section class="feature-strip" aria-label="Product highlights">
+            <article class="feature-card">
+                <div class="feature-label">01</div>
+                <h2>Multilingual Coverage</h2>
+                <p>TMDB data includes English, Telugu, Tamil, and Hindi movies in one search experience.</p>
+            </article>
+            <article class="feature-card">
+                <div class="feature-label">02</div>
+                <h2>Richer Features</h2>
+                <p>Recommendations are trained from genres, keywords, and overviews instead of genres alone.</p>
+            </article>
+            <article class="feature-card">
+                <div class="feature-label">03</div>
+                <h2>Poster-First Design</h2>
+                <p>Recommended titles ship with poster art, language metadata, and cinematic presentation.</p>
+            </article>
+        </section>
+    </main>
+
+    <div class="loading-overlay" id="loading-overlay" aria-hidden="true">
+        <div class="spinner-shell">
+            <div class="spinner-ring"></div>
+            <div class="spinner-text">Finding similar movies...</div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById("movie-input");
+        const sugBox = document.getElementById("suggestions");
+        const form = document.getElementById("recommend-form");
+        const loadingOverlay = document.getElementById("loading-overlay");
+
+        let debounceTimer;
+
+        input.addEventListener("input", () => {
+            clearTimeout(debounceTimer);
+            const query = input.value.trim();
+            if (query.length < 2) {
+                sugBox.innerHTML = "";
+                sugBox.classList.remove("visible");
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                fetch("/autocomplete?q=" + encodeURIComponent(query))
+                    .then((response) => response.json())
+                    .then((items) => {
+                        sugBox.innerHTML = "";
+                        if (!items.length) {
+                            sugBox.classList.remove("visible");
+                            return;
+                        }
+
+                        items.forEach((title) => {
+                            const li = document.createElement("li");
+                            li.textContent = title;
+                            li.addEventListener("click", () => {
+                                input.value = title;
+                                sugBox.innerHTML = "";
+                                sugBox.classList.remove("visible");
+                            });
+                            sugBox.appendChild(li);
+                        });
+
+                        sugBox.classList.add("visible");
+                    })
+                    .catch(() => {
+                        sugBox.innerHTML = "";
+                        sugBox.classList.remove("visible");
+                    });
+            }, 200);
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".search-wrapper")) {
+                sugBox.innerHTML = "";
+                sugBox.classList.remove("visible");
+            }
+        });
+
+        form.addEventListener("submit", () => {
+            loadingOverlay.classList.add("active");
+            loadingOverlay.setAttribute("aria-hidden", "false");
+        });
+    </script>
+</body>
+</html>
