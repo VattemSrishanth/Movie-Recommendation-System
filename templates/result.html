@@ -14,17 +14,28 @@
             <span class="brand-mark">N</span>
             <span class="brand-copy">AI Movie Recommendation System</span>
         </a>
-        <a href="/" class="btn btn-ghost">New Search</a>
+        <div class="topbar-actions">
+            <a href="/watched" class="btn btn-ghost btn-sm">Watched</a>
+            <a href="/" class="btn btn-ghost btn-sm">New Search</a>
+        </div>
     </header>
 
     <main class="results-layout">
         <section class="results-hero">
             <div>
-                <div class="eyebrow">Top 10 Similar Movies</div>
+                {% if is_filter %}
+                <div class="eyebrow">Top Results</div>
+                <h1 class="results-title">Top <span class="highlight">{{ movie_name }}</span></h1>
+                <p class="results-copy">
+                    Showing {{ result_count }} popular titles matching your filter.
+                </p>
+                {% else %}
+                <div class="eyebrow">Top Similar Movies</div>
                 <h1 class="results-title">Because you searched for <span class="highlight">{{ movie_name }}</span></h1>
                 <p class="results-copy">
-                    Ranked by genre similarity with popularity-aware tie breaking for stronger recommendations.
+                    Showing {{ result_count }} matches ranked by content similarity with popularity-aware tie breaking.
                 </p>
+                {% endif %}
             </div>
         </section>
 
@@ -56,11 +67,39 @@
                         </div>
                         <p class="card-genres">{{ movie.genres.replace('|', ' • ') }}</p>
                         <p class="card-overview">{{ movie.overview[:180] }}{% if movie.overview|length > 180 %}...{% endif %}</p>
+                        <button class="btn btn-watch" data-title="{{ movie.title }}" onclick="toggleWatch(this)">
+                            <svg class="watch-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Mark as Watched
+                        </button>
                     </div>
                 </article>
                 {% endfor %}
             </div>
         </section>
     </main>
+
+    <script>
+    function toggleWatch(btn) {
+        const title = btn.getAttribute("data-title");
+        const isWatched = btn.classList.contains("watched");
+        const url = isWatched ? "/unwatch" : "/watch";
+
+        fetch(url, {
+            method: "POST",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body: "title=" + encodeURIComponent(title)
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (isWatched) {
+                btn.classList.remove("watched");
+                btn.innerHTML = '<svg class="watch-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Mark as Watched';
+            } else {
+                btn.classList.add("watched");
+                btn.innerHTML = '<svg class="watch-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> ✓ Watched';
+            }
+        });
+    }
+    </script>
 </body>
 </html>

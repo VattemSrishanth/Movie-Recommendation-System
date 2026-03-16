@@ -327,6 +327,33 @@ input {
     line-height: 1.7;
 }
 
+/* ── Home picks (Trending Now) ─────────────────────────────────────────── */
+.home-picks {
+    margin-top: 42px;
+}
+
+.picks-header {
+    margin-bottom: 24px;
+}
+
+.picks-title {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.picks-subtitle {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.movie-card--clickable {
+    cursor: pointer;
+}
+
 .cards-section {
     margin-top: 28px;
 }
@@ -542,4 +569,114 @@ input {
         align-items: center;
         flex-wrap: wrap;
     }
+
+    .genre-row {
+        gap: 14px;
+    }
+}
+
+/* ── Topbar actions ──────────────────────────────────────────────────── */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-sm {
+    min-height: 40px;
+    padding: 0 16px;
+    font-size: 0.82rem;
+    border-radius: 12px;
+    gap: 6px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* ── Netflix-style genre rows ────────────────────────────────────────── */
+.genre-section {
+    margin-top: 38px;
+}
+
+.genre-title {
+    position: relative;
+    display: inline-block;
+}
+
+.genre-title::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 48px;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--red-bright), transparent);
+}
+
+.genre-row {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.genre-row::-webkit-scrollbar {
+    height: 6px;
+}
+
+.genre-row::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.genre-row::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+}
+
+.genre-row .movie-card--compact {
+    flex: 0 0 200px;
+    scroll-snap-align: start;
+}
+
+/* ── Watch button ────────────────────────────────────────────────────── */
+.btn-watch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #e0e0d7;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-watch:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn-watch.watched {
+    background: rgba(229, 9, 20, 0.18);
+    border-color: rgba(229, 9, 20, 0.4);
+    color: #ffb7bc;
+}
+
+.btn-watch.watched:hover {
+    background: rgba(229, 9, 20, 0.28);
+}
+
+.watch-icon {
+    flex-shrink: 0;
 }

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Watched Movies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="page-shell results-page">
+    <div class="page-backdrop"></div>
+
+    <header class="topbar">
+        <a href="/" class="brand">
+            <span class="brand-mark">N</span>
+            <span class="brand-copy">AI Movie Recommendation System</span>
+        </a>
+        <div class="topbar-actions">
+            <a href="/" class="btn btn-ghost btn-sm">Home</a>
+        </div>
+    </header>
+
+    <main class="results-layout">
+        <section class="results-hero">
+            <div>
+                <div class="eyebrow">Your Library</div>
+                <h1 class="results-title">Watched <span class="highlight">Movies</span></h1>
+                <p class="results-copy">
+                    {% if movies %}
+                    You've watched {{ movies|length }} movie{{ 's' if movies|length != 1 else '' }}. Your home page recommendations are based on these.
+                    {% else %}
+                    You haven't watched any movies yet. Search for movies and mark them as watched!
+                    {% endif %}
+                </p>
+            </div>
+        </section>
+
+        {% if movies %}
+        <section class="cards-section" aria-label="Watched movies">
+            <div class="cards cards-posters">
+                {% for movie in movies %}
+                <article class="movie-card">
+                    <div class="movie-poster-wrap">
+                        <img
+                            src="{{ movie.poster_url }}"
+                            alt="Poster for {{ movie.display_title }}"
+                            class="movie-poster"
+                            loading="lazy"
+                        />
+                        <div class="movie-overlay">
+                            {% if movie.year %}
+                            <span class="movie-year">{{ movie.year }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="card-title">{{ movie.display_title }}</h2>
+                        <div class="card-meta">
+                            <span class="movie-language">{{ movie.language }}</span>
+                            {% if movie.year %}
+                            <span class="movie-language">{{ movie.year }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="card-genres">{{ movie.genres.replace('|', ' • ') }}</p>
+                        <button class="btn btn-watch watched" data-title="{{ movie.title }}" onclick="removeWatch(this)">
+                            <svg class="watch-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            ✓ Watched
+                        </button>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <script>
+    function removeWatch(btn) {
+        const title = btn.getAttribute("data-title");
+        fetch("/unwatch", {
+            method: "POST",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body: "title=" + encodeURIComponent(title)
+        })
+        .then(r => r.json())
+        .then(() => {
+            const card = btn.closest(".movie-card");
+            card.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+            card.style.opacity = "0";
+            card.style.transform = "scale(0.9)";
+            setTimeout(() => card.remove(), 300);
+        });
+    }
+    </script>
+</body>
+</html>

@@ -14,7 +14,13 @@
             <span class="brand-mark">N</span>
             <span class="brand-copy">AI Movie Recommendation System</span>
         </a>
-        <div class="topbar-meta">Content-Based Discovery</div>
+        <div class="topbar-actions">
+            <a href="/watched" class="btn btn-ghost btn-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Watched{% if watched_count %} ({{ watched_count }}){% endif %}
+            </a>
+            <span class="topbar-meta">Content-Based Discovery</span>
+        </div>
     </header>
 
     <main class="landing">
@@ -22,13 +28,13 @@
             <div class="eyebrow">TMDB Multilingual Discovery</div>
             <h1 class="hero-title">Find your next obsession in one search.</h1>
             <p class="hero-copy">
-                Search across Hollywood, Telugu, Tamil, and Hindi cinema with a
-                recommendation engine trained on genres, keywords, and plot overviews.
+                Search a combined catalogue built from TMDB and MovieLens data with a
+                recommendation engine trained on genres, keywords, language, and plot overviews.
             </p>
 
             <div class="hero-tags">
                 <span>Hollywood + Indian Cinema</span>
-                <span>Genres + Keywords + Overview</span>
+                <span>Genres + Keywords + Language + Overview</span>
                 <span>Poster-Ready Results</span>
             </div>
 
@@ -55,13 +61,13 @@
         <section class="feature-strip" aria-label="Product highlights">
             <article class="feature-card">
                 <div class="feature-label">01</div>
-                <h2>Multilingual Coverage</h2>
-                <p>TMDB data includes English, Telugu, Tamil, and Hindi movies in one search experience.</p>
+                <h2>Combined Catalogue</h2>
+                <p>TMDB and MovieLens titles are merged into one searchable training dataset.</p>
             </article>
             <article class="feature-card">
                 <div class="feature-label">02</div>
                 <h2>Richer Features</h2>
-                <p>Recommendations are trained from genres, keywords, and overviews instead of genres alone.</p>
+                <p>Recommendations are trained from title, genres, keywords, language, and overviews instead of genres alone.</p>
             </article>
             <article class="feature-card">
                 <div class="feature-label">03</div>
@@ -69,6 +75,73 @@
                 <p>Recommended titles ship with poster art, language metadata, and cinematic presentation.</p>
             </article>
         </section>
+
+        {% if popular_movies %}
+        <section class="home-picks" aria-label="Popular movies">
+            <div class="picks-header">
+                <h2 class="picks-title">Trending Now</h2>
+                <p class="picks-subtitle">More top-ranked titles from the combined catalogue. Click any poster to get similar recommendations.</p>
+            </div>
+            <div class="cards cards-posters">
+                {% for movie in popular_movies %}
+                <article class="movie-card movie-card--clickable" data-title="{{ movie.display_title }}">
+                    <div class="movie-poster-wrap">
+                        <img
+                            src="{{ movie.poster_url }}"
+                            alt="Poster for {{ movie.display_title }}"
+                            class="movie-poster"
+                            loading="lazy"
+                        />
+                        <div class="movie-overlay">
+                            {% if movie.year %}
+                            <span class="movie-year">{{ movie.year }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ movie.display_title }}</h3>
+                        <div class="card-meta">
+                            <span class="movie-language">{{ movie.language }}</span>
+                        </div>
+                        <p class="card-genres">{{ movie.genres.replace('|', ' • ') }}</p>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% for section in sections %}
+        <section class="home-picks genre-section" aria-label="{{ section.title }}">
+            <div class="picks-header">
+                <h2 class="picks-title genre-title">{{ section.title }}</h2>
+                <p class="picks-subtitle">{{ section.reason }}</p>
+            </div>
+            <div class="genre-row">
+                {% for movie in section.movies %}
+                <article class="movie-card movie-card--clickable movie-card--compact" data-title="{{ movie.display_title }}">
+                    <div class="movie-poster-wrap">
+                        <img
+                            src="{{ movie.poster_url }}"
+                            alt="Poster for {{ movie.display_title }}"
+                            class="movie-poster"
+                            loading="lazy"
+                        />
+                        <div class="movie-overlay">
+                            {% if movie.year %}
+                            <span class="movie-year">{{ movie.year }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ movie.display_title }}</h3>
+                        <p class="card-genres">{{ movie.genres.replace('|', ' • ') }}</p>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
     </main>
 
     <div class="loading-overlay" id="loading-overlay" aria-hidden="true">
@@ -135,6 +208,20 @@
         form.addEventListener("submit", () => {
             loadingOverlay.classList.add("active");
             loadingOverlay.setAttribute("aria-hidden", "false");
+        });
+
+        // Click a trending movie card → submit its title for recommendations
+        document.querySelectorAll(".movie-card--clickable").forEach((card) => {
+            card.style.cursor = "pointer";
+            card.addEventListener("click", () => {
+                const title = card.getAttribute("data-title");
+                if (title) {
+                    input.value = title;
+                    loadingOverlay.classList.add("active");
+                    loadingOverlay.setAttribute("aria-hidden", "false");
+                    form.submit();
+                }
+            });
         });
     </script>
 </body>
