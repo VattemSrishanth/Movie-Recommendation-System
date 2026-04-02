@@ -158,12 +158,6 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_knn_model(df: pd.DataFrame):
-    """TF-IDF vectorize the tags column and train a KNN model.
-
-    Uses sklearn NearestNeighbors with cosine distance. The fitted model
-    stores the TF-IDF vectors internally and uses a ball-tree structure
-    for fast k-neighbour lookups, scaling well to 50k+ movies.
-    """
     tfidf = TfidfVectorizer(max_features=15000, stop_words="english")
     tfidf_matrix = tfidf.fit_transform(df["tags"])
     print(f"TF-IDF matrix shape: {tfidf_matrix.shape}")
@@ -175,12 +169,8 @@ def build_knn_model(df: pd.DataFrame):
     print(f"KNN model trained  (k={k}, metric=cosine)")
 
     return knn, tfidf_matrix
-
-
 KNN_PKL = os.path.join(MODEL_DIR, "knn_model.pkl")
 TFIDF_PKL = os.path.join(MODEL_DIR, "tfidf_matrix.pkl")
-
-
 def save_model(df: pd.DataFrame, knn_model, tfidf_matrix):
     """Save movies DataFrame, fitted KNN model, and TF-IDF matrix."""
     os.makedirs(MODEL_DIR, exist_ok=True)
