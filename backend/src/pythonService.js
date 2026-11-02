@@ -9,9 +9,7 @@ const projectRoot = path.resolve(__dirname, "..", "..");
 const bridgePath = path.join(backendRoot, "api_bridge.py");
 
 const isWindows = process.platform === "win32";
-const defaultPython = isWindows
-  ? path.join(projectRoot, ".venv", "Scripts", "python.exe")
-  : "python3";
+const defaultPython = isWindows ? "python" : "python3";
 
 const pythonExecutable = process.env.PYTHON_EXECUTABLE || defaultPython;
 
