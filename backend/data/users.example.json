@@ -1,0 +1,8 @@
+[
+  {
+    "id": "demo-user-uuid",
+    "username": "demo_user",
+    "password_hash": "$2a$10$demoHashedPasswordExampleStringOnly",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  }
+]
